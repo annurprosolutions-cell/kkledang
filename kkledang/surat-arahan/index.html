@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Penjana Surat Perlantikan PSH</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        /* Custom Styles for A4 Preview */
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm; /* Standard A4 height */
+            padding: 12mm 15mm; 
+            margin: 10mm auto;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            box-sizing: border-box;
+            font-size: 11pt; 
+            line-height: 1.3; 
+            color: #000;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            .a4-page { margin: 0; box-shadow: none; }
+            body { background: white; }
+        }
+
+        .data-hl {
+            background-color: rgba(253, 224, 71, 0.3);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        canvas.signature-pad {
+            border: 1px dashed #9ca3af;
+            border-radius: 0.375rem;
+            background-color: #ffffff;
+            cursor: crosshair;
+            width: 100%;
+            height: 150px;
+            touch-action: none;
+        }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row md:h-screen md:overflow-hidden bg-gray-100 font-sans">
+
+    <!-- LEFT PANEL: FORM INPUT -->
+    <div class="w-full md:w-1/2 md:h-full md:overflow-y-auto bg-white border-r border-gray-300 p-5 md:p-8 flex flex-col no-print">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Borang Surat Perlantikan PSH</h2>
+        
+        <form id="suratForm" class="space-y-6 flex-grow">
+            
+            <!-- Rujukan & Tarikh Surat -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">No. Rujukan (Jilid)</label>
+                    <div class="flex items-center mt-1">
+                        <span class="text-sm text-gray-500 mr-2">J02 .500-10 JLD (</span>
+                        <input type="text" id="in-jilid" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:ring-blue-500 focus:border-blue-500 text-center" placeholder="10">
+                        <span class="text-sm text-gray-500 ml-2">)</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tarikh Surat</label>
+                    <input type="date" id="in-tarikh-surat" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
+            <!-- Penerima Surat -->
+            <div class="border rounded-md p-4 bg-gray-50 space-y-4">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <label class="block text-sm font-bold text-gray-700">Maklumat Penerima</label>
+                    <button type="button" id="btn-tambah-penerima" class="text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded font-semibold transition-colors">+ Tambah Penerima</button>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 1 (Utama)</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                        <input type="text" id="in-nama-1" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
+                        <input type="text" id="in-ic-1" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                    </div>
+                </div>
+
+                <div id="penerima-2-input-container" class="hidden relative pt-2 border-t border-dashed">
+                    <button type="button" onclick="buangPenerima(2)" class="absolute top-2 right-0 text-xs text-red-600 hover:underline font-semibold">Buang</button>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 2</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                        <input type="text" id="in-nama-2" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
+                        <input type="text" id="in-ic-2" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                    </div>
+                </div>
+
+                <div id="penerima-3-input-container" class="hidden relative pt-2 border-t border-dashed">
+                    <button type="button" onclick="buangPenerima(3)" class="absolute top-2 right-0 text-xs text-red-600 hover:underline font-semibold">Buang</button>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 3</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                        <input type="text" id="in-nama-3" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
+                        <input type="text" id="in-ic-3" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                    </div>
+                </div>
+
+                <div id="penerima-4-input-container" class="hidden relative pt-2 border-t border-dashed">
+                    <button type="button" onclick="buangPenerima(4)" class="absolute top-2 right-0 text-xs text-red-600 hover:underline font-semibold">Buang</button>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 4</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                        <input type="text" id="in-nama-4" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
+                        <input type="text" id="in-ic-4" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                    </div>
+                </div>
+
+                <div id="penerima-5-input-container" class="hidden relative pt-2 border-t border-dashed">
+                    <button type="button" onclick="buangPenerima(5)" class="absolute top-2 right-0 text-xs text-red-600 hover:underline font-semibold">Buang</button>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 5</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                        <input type="text" id="in-nama-5" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
+                        <input type="text" id="in-ic-5" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maklumat Program -->
+            <div class="border rounded-md p-4 bg-gray-50 space-y-4">
+                <label class="block text-sm font-bold text-gray-700 border-b pb-2">Maklumat Program</label>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tajuk Program / Kursus</label>
+                    <textarea id="in-tajuk-program" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 uppercase" placeholder="KURSUS 0127 AALK PENGHASILAN POSTER..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Tarikh Program</label>
+                        <input type="date" id="in-tarikh-program" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Waktu Mula</label>
+                        <input type="time" id="in-waktu-mula" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Waktu Tamat</label>
+                        <input type="time" id="in-waktu-tamat" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tandatangan Pengarah (LOCKED) -->
+            <div class="border rounded-md p-4 bg-gray-50">
+                <label class="block text-sm font-medium text-gray-700 mb-2 border-b pb-2">Maklumat Pengesah & Tandatangan</label>
+                
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-gray-600 uppercase">Pilih Pengesah</label>
+                    <select id="in-pengesah" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm bg-white focus:ring-blue-500 focus:border-blue-500">
+                        <option value="pengarah">Pengarah (Mohd Hoirie bin Abdul Manah)</option>
+                        <option value="timbalan">Timbalan Pengarah (Zulita binti Zainudin)</option>
+                    </select>
+                </div>
+
+                <div class="mb-2 relative">
+                    <div class="absolute inset-0 z-10 bg-gray-200/70 backdrop-blur-[1px] flex flex-col items-center justify-center cursor-not-allowed border border-dashed border-gray-400 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                        <span class="text-gray-800 text-[10px] sm:text-xs font-semibold text-center px-2">Tandatangan hanya melalui pautan Pengesah</span>
+                    </div>
+                    <canvas id="canvas-pengarah" class="signature-pad bg-gray-100"></canvas>
+                </div>
+            </div>
+            
+            <!-- Bahagian Butang Tindakan -->
+            <div class="sticky bottom-0 bg-white pt-4 pb-4 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3 z-10 mt-6 shadow-[0_-10px_15px_-3px_rgba(255,255,255,1)]">
+                <button type="button" onclick="simpanKeGoogleSheet()" id="btn-simpan-db" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 sm:py-2 px-6 rounded shadow transition duration-200 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                    Simpan dan Jana Link
+                </button>
+                <button type="button" onclick="generatePDF()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 sm:py-2 px-6 rounded shadow transition duration-200 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Muat Turun PDF
+                </button>
+            </div>
+            
+        </form>
+    </div>
+
+    <!-- RIGHT PANEL: PREVIEW & EXPORT -->
+    <div class="w-full md:w-1/2 md:h-full bg-gray-200 overflow-auto relative py-6 md:py-8">
+        
+        <div class="sticky top-4 z-10 w-[90%] sm:w-full max-w-3xl mx-auto flex justify-center items-center bg-white p-3 sm:p-4 rounded-md shadow-md mb-6 border border-gray-200 no-print">
+            <span class="font-bold text-gray-700 text-base sm:text-lg text-center">Pratonton Dokumen A4</span>
+        </div>
+
+        <div id="pdf-container" class="w-max mx-auto flex flex-col">
+            <div class="a4-page">
+                
+                <!-- HEADER LETTERHEAD -->
+                <div class="flex items-center border-b-[1.5px] border-black pb-2 mb-4">
+                    <div class="w-24 shrink-0 flex items-center justify-center mr-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png" alt="Jata" class="h-16 object-contain">
+                    </div>
+                    <div class="flex-grow flex flex-col justify-center">
+                        <h1 class="font-bold text-[12pt] leading-tight">KOLEJ KOMUNITI LEDANG</h1>
+                        <h2 class="font-bold text-[10pt] leading-tight mb-1">KEMENTERIAN PENDIDIKAN TINGGI</h2>
+                        <p class="text-[9pt] leading-tight">
+                            KM 5, JALAN PAYAMAS<br>
+                            84900 TANGKAK<br>
+                            JOHOR
+                        </p>
+                    </div>
+                    <div class="text-right text-[9pt] leading-tight flex flex-col justify-end h-full mt-8">
+                        <p>TEL : 069789295/0108172799</p>
+                        <p>FAKS : 079791682</p>
+                        <p>EMEL : fairuzzy@lecturer.kklej.edu.my</p>
+                        <p>WEB : www.kklej.edu.my</p>
+                    </div>
+                </div>
+
+                <!-- INFO RUJUKAN & TARIKH -->
+                <div class="mb-4">
+                    <p class="mb-1">No. Rujukan : J02 .500-10 JLD <span id="out-jilid" class="data-hl font-medium ml-1 mr-1">(&nbsp;&nbsp;&nbsp;&nbsp;)</span></p>
+                    <p>Tarikh : <span id="out-tarikh-surat" class="data-hl font-medium">-- KOSONG --</span></p>
+                </div>
+
+                <!-- KEPADA -->
+                <div class="mb-4">
+                    <p>Kepada,</p>
+                    <div id="out-penerima-1" class="font-bold">
+                        <span id="out-nama-1" class="data-hl uppercase">NAMA PENERIMA 1</span><br>
+                        <span id="out-ic-1" class="data-hl font-normal">NO IC PENERIMA 1</span>
+                    </div>
+                    
+                    <div id="out-penerima-2-container" class="hidden font-bold mt-1">
+                        <span id="out-nama-2" class="data-hl uppercase">NAMA PENERIMA 2</span><br>
+                        <span id="out-ic-2" class="data-hl font-normal">NO IC PENERIMA 2</span>
+                    </div>
+
+                    <div id="out-penerima-3-container" class="hidden font-bold mt-1">
+                        <span id="out-nama-3" class="data-hl uppercase">NAMA PENERIMA 3</span><br>
+                        <span id="out-ic-3" class="data-hl font-normal">NO IC PENERIMA 3</span>
+                    </div>
+
+                    <div id="out-penerima-4-container" class="hidden font-bold mt-1">
+                        <span id="out-nama-4" class="data-hl uppercase">NAMA PENERIMA 4</span><br>
+                        <span id="out-ic-4" class="data-hl font-normal">NO IC PENERIMA 4</span>
+                    </div>
+
+                    <div id="out-penerima-5-container" class="hidden font-bold mt-1">
+                        <span id="out-nama-5" class="data-hl uppercase">NAMA PENERIMA 5</span><br>
+                        <span id="out-ic-5" class="data-hl font-normal">NO IC PENERIMA 5</span>
+                    </div>
+                </div>
+
+                <!-- SALUTASI & TAJUK -->
+                <div class="mb-4">
+                    <p class="mb-3">Tuan/Puan</p>
+                    <p class="font-bold uppercase text-justify">
+                        PERLANTIKAN SEBAGAI PENSYARAH / PENCERAMAH SAMBILAN / PENSYARAH PEMBANTU / PENYELARAS BAGI PROGRAM PEMBELAJARAN SEPANJANG HAYAT
+                    </p>
+                </div>
+
+                <!-- KANDUNGAN SURAT -->
+                <div class="space-y-3 text-justify mb-5">
+                    <p>Dengan segala hormatnya perkara di atas adalah dirujuk</p>
+                    
+                    <p>
+                        2. Sukacita dimaklumkan bahawa tuan/puan telah dilantik sebagai pensyarah utama / pensyarah sambilan / pensyarah pembantu / penyelaras * bagi menjayakan 
+                        <span id="out-tajuk-program" class="data-hl font-bold uppercase">TAJUK PROGRAM</span> mengikut ketetapan seperti berikut:
+                    </p>
+
+                    <div class="ml-8 font-bold">
+                        <table class="w-full">
+                            <tr>
+                                <td class="w-24 align-top">TARIKH</td>
+                                <td class="w-4 align-top">:</td>
+                                <td class="align-top"><span id="out-tarikh-program" class="data-hl uppercase">HARI, DD BULAN YYYY</span></td>
+                            </tr>
+                            <tr>
+                                <td class="align-top">WAKTU</td>
+                                <td class="align-top">:</td>
+                                <td class="align-top"><span id="out-waktu" class="data-hl uppercase">0.00PG - 0.00PTG</span></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <p>
+                        3. Sehubungan itu, tuan diminta untuk menyediakan salinan dokumen-dokumen yang akan dimasukkan dalam Fail Rekod Pensyarah Pembelajaran Sepanjang Hayat (FRP PSH). Kandungan dokumen FRP PSH tersebut boleh diperolehi daripada Sistem ePSH
+                    </p>
+
+                    <p>
+                        4. Diharap tuan/puan dapat memberikan komitmen yang penuh dalam menjalankan tugas ini. Segala kerjasama daripada pihak tuan/puan dalam perkara ini amatlah dihargai dan didahului dengan ucapan terima kasih
+                    </p>
+
+                    <p>Sekian, terima kasih.</p>
+                </div>
+
+                <!-- TANDATANGAN & PENUTUP -->
+                <div>
+                    <p class="font-bold mb-3">"BERKHIDMAT UNTUK NEGARA"</p>
+                    <p class="mb-1">Saya yang menjalankan amanah,</p>
+                    
+                    <!-- Ruang Sign -->
+                    <div class="h-16 w-64 flex items-end justify-start relative mb-0">
+                        <!-- Canvas Image Output -->
+                        <img id="out-sign-pengarah" src="" alt="" class="max-h-full max-w-full hidden mix-blend-multiply">
+                    </div>
+
+                    <p class="font-bold mt-1 uppercase" id="out-nama-pengesah">MOHD HOIRIE BIN ABDUL MANAH</p>
+                    <p id="out-jawatan-pengesah">Pengarah</p>
+                    <p>KOLEJ KOMUNITI LEDANG</p>
+                    <p>KEMENTERIAN PENDIDIKAN TINGGI</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Message Modal -->
+    <div id="custom-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-0 no-print">
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl transform transition-all relative z-10">
+            <h3 id="modal-title" class="text-lg leading-6 font-bold text-gray-900 mb-2">Makluman</h3>
+            <div class="mt-2">
+                <p id="modal-message" class="text-sm text-gray-600"></p>
+            </div>
+            <div class="mt-5 flex justify-end">
+                <button onclick="closeModal()" type="button" class="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom Modal Functions
+        function showMessage(msg, title = 'Makluman') {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = msg;
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        // Copy Link Function
+        window.copyLink = function() {
+            var copyText = document.getElementById('link-to-copy');
+            if(copyText) {
+                copyText.select();
+                copyText.setSelectionRange(0, 99999);
+                document.execCommand('copy');
+                showMessage('Pautan telah berjaya disalin!', 'Berjaya');
+            }
+        };
+
+        const bulanBM = ['JANUARI', 'FEBRUARI', 'MAC', 'APRIL', 'MEI', 'JUN', 'JULAI', 'OGOS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DISEMBER'];
+        const hariBM = ['AHAD', 'ISNIN', 'SELASA', 'RABU', 'KHAMIS', 'JUMAAT', 'SABTU'];
+
+        function formatTarikhMelayu(dateString, includeHari = false) {
+            if (!dateString) return '';
+            const d = new Date(dateString);
+            const namaHari = hariBM[d.getDay()];
+            const hari = d.getDate().toString().padStart(2, '0');
+            const bulan = bulanBM[d.getMonth()];
+            const tahun = d.getFullYear();
+            
+            if (includeHari) {
+                return `${namaHari}, ${hari} ${bulan} ${tahun}`;
+            }
+            return `${hari} ${bulan} ${tahun}`;
+        }
+
+        function formatWaktu(timeStr) {
+            if (!timeStr) return '';
+            let [h, m] = timeStr.split(':');
+            h = parseInt(h);
+            const suffix = h >= 12 ? 'PTG' : 'PG';
+            const h12 = h % 12 || 12;
+            return `${h12}.${m}${suffix}`;
+        }
+
+        document.getElementById('in-jilid').addEventListener('input', function() {
+            const val = this.value.trim();
+            document.getElementById('out-jilid').textContent = val ? `( ${val} )` : '(    )';
+        });
+
+        document.getElementById('in-tarikh-surat').addEventListener('input', function() {
+            const formatted = formatTarikhMelayu(this.value, false);
+            document.getElementById('out-tarikh-surat').textContent = formatted || '-- KOSONG --';
+        });
+
+        document.getElementById('in-nama-1').addEventListener('input', function() {
+            document.getElementById('out-nama-1').textContent = this.value || 'NAMA PENERIMA 1';
+        });
+        document.getElementById('in-ic-1').addEventListener('input', function() {
+            document.getElementById('out-ic-1').textContent = this.value || 'NO IC PENERIMA 1';
+        });
+
+        const btnTambahPenerima = document.getElementById('btn-tambah-penerima');
+        const maxPenerima = 5;
+        
+        btnTambahPenerima.addEventListener('click', function() {
+            for (let i = 2; i <= maxPenerima; i++) {
+                const container = document.getElementById(`penerima-${i}-input-container`);
+                if (container.classList.contains('hidden')) {
+                    container.classList.remove('hidden');
+                    if (i === maxPenerima) {
+                        btnTambahPenerima.classList.add('hidden');
+                    }
+                    break;
+                }
+            }
+        });
+
+        window.buangPenerima = function(index) {
+            document.getElementById(`penerima-${index}-input-container`).classList.add('hidden');
+            document.getElementById(`in-nama-${index}`).value = '';
+            document.getElementById(`in-ic-${index}`).value = '';
+            updatePenerima(index);
+            btnTambahPenerima.classList.remove('hidden'); 
+        };
+
+        function updatePenerima(index) {
+            const nama = document.getElementById(`in-nama-${index}`).value.trim();
+            const ic = document.getElementById(`in-ic-${index}`).value.trim();
+            const container = document.getElementById(`out-penerima-${index}-container`);
+            
+            if (nama || ic) {
+                container.classList.remove('hidden');
+                document.getElementById(`out-nama-${index}`).textContent = nama || `NAMA PENERIMA ${index}`;
+                document.getElementById(`out-ic-${index}`).textContent = ic || `NO IC PENERIMA ${index}`;
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+        
+        for (let i = 2; i <= maxPenerima; i++) {
+            document.getElementById(`in-nama-${i}`).addEventListener('input', () => updatePenerima(i));
+            document.getElementById(`in-ic-${i}`).addEventListener('input', () => updatePenerima(i));
+        }
+
+        document.getElementById('in-tajuk-program').addEventListener('input', function() {
+            document.getElementById('out-tajuk-program').textContent = this.value || 'TAJUK PROGRAM';
+        });
+
+        document.getElementById('in-tarikh-program').addEventListener('input', function() {
+            const formatted = formatTarikhMelayu(this.value, true);
+            document.getElementById('out-tarikh-program').textContent = formatted || 'HARI, DD BULAN YYYY';
+        });
+
+        function updateWaktuRange() {
+            const mula = document.getElementById('in-waktu-mula').value;
+            const tamat = document.getElementById('in-waktu-tamat').value;
+            let str = '0.00PG - 0.00PTG';
+            
+            if (mula && tamat) {
+                str = `${formatWaktu(mula)} - ${formatWaktu(tamat)}`;
+            } else if (mula) {
+                str = `${formatWaktu(mula)} - ?`;
+            } else if (tamat) {
+                str = `? - ${formatWaktu(tamat)}`;
+            }
+            document.getElementById('out-waktu').textContent = str;
+        }
+        document.getElementById('in-waktu-mula').addEventListener('input', updateWaktuRange);
+        document.getElementById('in-waktu-tamat').addEventListener('input', updateWaktuRange);
+
+        // Logic untuk pilihan pengesah
+        document.getElementById('in-pengesah').addEventListener('change', function() {
+            const val = this.value;
+            if (val === 'pengarah') {
+                document.getElementById('out-nama-pengesah').textContent = 'MOHD HOIRIE BIN ABDUL MANAH';
+                document.getElementById('out-jawatan-pengesah').textContent = 'Pengarah';
+            } else if (val === 'timbalan') {
+                document.getElementById('out-nama-pengesah').textContent = 'ZULITA BINTI ZAINUDIN';
+                document.getElementById('out-jawatan-pengesah').textContent = 'Timbalan Pengarah';
+            }
+        });
+
+        async function generatePDF() {
+            const element = document.getElementById('pdf-container');
+            const tajuk = document.getElementById('in-nama-1').value || 'Surat_Perlantikan';
+            
+            const highlights = element.querySelectorAll('.data-hl');
+            highlights.forEach(el => el.style.backgroundColor = 'transparent');
+
+            const opt = {
+                margin:       0, 
+                filename:     `${tajuk.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            const btn = document.querySelector('button[onclick="generatePDF()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Menjana PDF... Sila Tunggu';
+            btn.disabled = true;
+
+            const pages = element.querySelectorAll('.a4-page');
+            pages.forEach(p => { p.style.margin = '0'; p.style.boxShadow = 'none'; });
+
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } catch (err) {
+                showMessage("Ralat semasa menjana PDF: " + err, 'Ralat');
+            } finally {
+                pages.forEach(p => { p.style.margin = ''; p.style.boxShadow = ''; });
+                highlights.forEach(el => el.style.backgroundColor = '');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function simpanKeGoogleSheet() {
+            const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFvHI4LLnXY3Ts33edOYgyS9QN7TO_PYoRpxd3GCD_rX7Kt85a7ybuovRK6H2s3xapzg/exec";
+            
+            if (!APPSCRIPT_URL || APPSCRIPT_URL === "MASUKKAN_WEB_APP_URL_ANDA_DI_SINI") {
+                showMessage("Sila masukkan Web App URL Google Apps Script ke dalam kod sumber terlebih dahulu.", 'Peringatan');
+                return;
+            }
+
+            const btn = document.getElementById('btn-simpan-db');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Menjana Draft & Pautan...'; 
+            btn.disabled = true;
+            
+            const oldInfo = document.getElementById('approval-link-info');
+            if(oldInfo) oldInfo.remove();
+
+            try {
+                const element = document.getElementById('pdf-container');
+                const tajuk = document.getElementById('in-nama-1').value || 'Surat_Perlantikan';
+                
+                const highlights = element.querySelectorAll('.data-hl');
+                highlights.forEach(el => el.style.backgroundColor = 'transparent');
+
+                const opt = {
+                    margin:       0,
+                    filename:     `${tajuk.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                const pages = element.querySelectorAll('.a4-page');
+                pages.forEach(p => { p.style.margin = '0'; p.style.boxShadow = 'none'; });
+
+                let pdfBase64 = "";
+                try {
+                    pdfBase64 = await html2pdf().set(opt).from(element).outputPdf('datauristring');
+                } catch (pdfErr) {
+                    throw new Error("Gagal menjana PDF Base64.");
+                } finally {
+                    pages.forEach(p => { p.style.margin = ''; p.style.boxShadow = ''; });
+                    highlights.forEach(el => el.style.backgroundColor = '');
+                }
+
+                btn.innerHTML = 'Memuat Naik Data...';
+
+                const data = {
+                    action: "submit_draft_surat",
+                    rujukan_jilid: document.getElementById('in-jilid').value || '-',
+                    tarikh_surat: document.getElementById('out-tarikh-surat').textContent || '-',
+                    nama_penerima_1: document.getElementById('in-nama-1').value || '-',
+                    ic_penerima_1: document.getElementById('in-ic-1').value || '-',
+                    nama_penerima_2: document.getElementById('in-nama-2').value || '-',
+                    ic_penerima_2: document.getElementById('in-ic-2').value || '-',
+                    nama_penerima_3: document.getElementById('in-nama-3').value || '-',
+                    ic_penerima_3: document.getElementById('in-ic-3').value || '-',
+                    nama_penerima_4: document.getElementById('in-nama-4').value || '-',
+                    ic_penerima_4: document.getElementById('in-ic-4').value || '-',
+                    nama_penerima_5: document.getElementById('in-nama-5').value || '-',
+                    ic_penerima_5: document.getElementById('in-ic-5').value || '-',
+                    tajuk_program: document.getElementById('in-tajuk-program').value || '-',
+                    tarikh_program: document.getElementById('out-tarikh-program').textContent || '-',
+                    waktu_program: document.getElementById('out-waktu').textContent || '-',
+                    nama_pengesah: document.getElementById('out-nama-pengesah').textContent,
+                    jawatan_pengesah: document.getElementById('out-jawatan-pengesah').textContent,
+                    pdfBase64: pdfBase64 
+                };
+
+                const response = await fetch(APPSCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(data),
+                    redirect: 'follow'
+                });
+                
+                const text = await response.text();
+                
+                try {
+                    const result = JSON.parse(text);
+                    if(result.status === "success") {
+                        const formSection = document.getElementById('suratForm');
+                        const linkUI = `
+                        <div id="approval-link-info" class="mt-4 bg-green-50 border border-green-300 p-4 rounded-md shadow-sm mb-4">
+                            <h4 class="text-green-800 font-bold mb-2">✅ Rekod Berjaya Disimpan!</h4>
+                            <p class="text-sm text-gray-700 mb-2">Sila kongsikan pautan ini atau muat turun PDF untuk tindakan selanjutnya.</p>
+                            <div class="flex">
+                                <input type="text" id="link-to-copy" value="${result.approvalLink}" readonly class="w-full border p-2 rounded-l-md text-gray-600 bg-white" onclick="this.select()">
+                                <button type="button" onclick="copyLink()" class="bg-blue-600 text-white px-4 rounded-r-md hover:bg-blue-700 transition-colors">Salin</button>
+                            </div>
+                        </div>`;
+                        
+                        formSection.querySelector('.sticky').insertAdjacentHTML('beforebegin', linkUI);
+                        document.getElementById('approval-link-info').scrollIntoView({behavior: 'smooth', block: 'end'});
+                        
+                    } else {
+                        showMessage("Ralat pelayan: " + result.message, 'Ralat');
+                    }
+                } catch (e) {
+                    console.error("Respons pelayan bukan JSON:", text);
+                    showMessage("Ralat! Data gagal disimpan. Sila pastikan Web App Google Apps Script anda telah di-deploy dengan Access: 'Anyone' (Sesiapa sahaja).", 'Ralat');
+                }
+            } catch (error) {
+                showMessage("Berlaku ralat: " + error.message, 'Ralat');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
