@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Portal Pengurusan & Analisis</title>
+    
+    <!-- PWA & Mobile Meta Tags -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Portal Pintar">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Favicon & App Icons (Using provided logo) -->
+    <!-- Note: Attempting to use the direct image link from Postimg. Fallback provided in img tags. -->
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/zV0yCRpJ/logo.png">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/zV0yCRpJ/logo.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS for subtle animations & tooltip -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tooltip custom styling for better mobile support */
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- ========================================== -->
+    <!-- VIEW: LOGIN PAGE -->
+    <!-- ========================================== -->
+    <div id="login-view" class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden fade-in">
+        <div class="bg-blue-600 p-6 flex flex-col items-center">
+            <!-- Logo with fallback if direct postimg link fails -->
+            <img src="https://i.postimg.cc/zV0yCRpJ/logo.png" onerror="this.src='https://placehold.co/100x100/ffffff/2563eb?text=LOGO'" alt="Logo" class="w-24 h-24 object-contain mb-4 rounded-full bg-white p-1 shadow-md">
+            <h1 class="text-2xl font-bold text-white tracking-wide">Log Masuk</h1>
+            <p class="text-blue-100 text-sm mt-1">Sila masukkan emel dan kata laluan anda</p>
+        </div>
+        
+        <form id="login-form" class="p-8 space-y-6">
+            <div id="error-message" class="hidden bg-red-50 text-red-600 text-sm p-3 rounded-lg border border-red-200 text-center">
+                Log masuk gagal. Sila semak emel dan kata laluan anda.
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-2" for="email">Emel Pengguna</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-slate-400"></i>
+                    </div>
+                    <input type="email" id="email" required placeholder="contoh@emel.com"
+                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-2" for="password">Kata Laluan</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-slate-400"></i>
+                    </div>
+                    <input type="password" id="password" required placeholder="••••••••"
+                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                </div>
+            </div>
+
+            <button type="submit" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition-all flex justify-center items-center gap-2">
+                <span id="btn-text">Log Masuk</span>
+                <i id="btn-spinner" class="fas fa-circle-notch fa-spin hidden"></i>
+            </button>
+            
+            <p id="data-status" class="text-xs text-center text-slate-400 mt-4">
+                <i class="fas fa-spinner fa-spin mr-1"></i> Sedang menyambung ke pangkalan data...
+            </p>
+        </form>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW: MAIN DASHBOARD -->
+    <!-- ========================================== -->
+    <div id="dashboard-view" class="hidden w-full max-w-5xl fade-in">
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+            <div class="flex items-center gap-3">
+                <img src="https://i.postimg.cc/zV0yCRpJ/logo.png" onerror="this.src='https://placehold.co/100x100/2563eb/ffffff?text=LOGO'" alt="Logo" class="w-10 h-10 object-contain rounded-full shadow-sm">
+                <h2 class="text-xl font-bold text-slate-800">Menu Utama</h2>
+            </div>
+            <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700 font-medium px-4 py-2 rounded-lg hover:bg-red-50 transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i>Log Keluar
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Card 1: Sistem Generator -->
+            <div onclick="showView('generator-view')" class="group cursor-pointer bg-white rounded-2xl p-8 shadow-sm border border-slate-200 hover:border-blue-500 hover:shadow-lg transition-all relative overflow-hidden flex flex-col items-center text-center">
+                <div class="absolute top-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                
+                <!-- Info Tooltip -->
+                <div class="absolute top-4 right-4 tooltip z-10" onclick="event.stopPropagation();">
+                    <i class="fas fa-info-circle text-slate-400 hover:text-blue-600 text-xl cursor-help"></i>
+                    <div class="tooltip-text absolute top-full right-0 mt-2 w-48 bg-slate-800 text-white text-xs rounded-lg py-2 px-3 text-center shadow-xl">
+                        Termasuk: Kertas Kerja, Laporan Kursus, Surat Arahan etc.
+                    </div>
+                </div>
+
+                <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">Sistem Generator</h3>
+                <p class="text-slate-500">Jana dokumen rasmi dengan mudah dan pantas.</p>
+            </div>
+
+            <!-- Card 2: Analisis Dashboard -->
+            <a href="/dashboard" class="block group cursor-pointer bg-white rounded-2xl p-8 shadow-sm border border-slate-200 hover:border-emerald-500 hover:shadow-lg transition-all relative overflow-hidden flex flex-col items-center text-center">
+                <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">Analisis Dashboard</h3>
+                <p class="text-slate-500">Lihat statistik dan laporan data secara menyeluruh.</p>
+            </a>
+
+            <!-- Card 3: Tetapan Akaun -->
+            <div onclick="showView('setup-view')" class="group cursor-pointer bg-white rounded-2xl p-8 shadow-sm border border-slate-200 hover:border-orange-500 hover:shadow-lg transition-all relative overflow-hidden flex flex-col items-center text-center">
+                <div class="absolute top-0 left-0 w-full h-1 bg-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                <div class="w-20 h-20 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">Tetapan Akaun</h3>
+                <p class="text-slate-500">Kemaskini emel dan kata laluan anda di sini.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW: SISTEM GENERATOR SUB-MENU -->
+    <!-- ========================================== -->
+    <div id="generator-view" class="hidden w-full max-w-5xl fade-in">
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+            <div class="flex items-center gap-4">
+                <button onclick="showView('dashboard-view')" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 flex items-center justify-center transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 class="text-xl font-bold text-slate-800">Sistem Generator</h2>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Sub Card 1 -->
+            <a href="/kertas-kerja" class="group bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-indigo-500 hover:shadow-md transition-all flex flex-col items-center text-center">
+                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center text-2xl mb-4 group-hover:-translate-y-1 transition-transform">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Kertas Kerja</h3>
+            </a>
+
+            <!-- Sub Card 2 -->
+            <a href="/laporan-kursus" class="group bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-purple-500 hover:shadow-md transition-all flex flex-col items-center text-center">
+                <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center text-2xl mb-4 group-hover:-translate-y-1 transition-transform">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Laporan Kursus</h3>
+            </a>
+
+            <!-- Sub Card 3 -->
+            <a href="/surat-arahan" class="group bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-amber-500 hover:shadow-md transition-all flex flex-col items-center text-center">
+                <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center text-2xl mb-4 group-hover:-translate-y-1 transition-transform">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Surat Arahan</h3>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW: TETAPAN AKAUN (SETUP) -->
+    <!-- ========================================== -->
+    <div id="setup-view" class="hidden w-full max-w-2xl fade-in">
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+            <div class="flex items-center gap-4">
+                <button onclick="showView('dashboard-view')" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 flex items-center justify-center transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 class="text-xl font-bold text-slate-800">Tetapan Akaun</h2>
+            </div>
+        </header>
+
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+            <form id="setup-form" class="space-y-6">
+                <div id="setup-message" class="hidden text-sm p-3 rounded-lg border text-center"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Emel Semasa</label>
+                        <input type="email" id="current-email" required class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 cursor-not-allowed" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Kata Laluan Semasa (Wajib)</label>
+                        <input type="password" id="current-password" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 transition-colors" placeholder="Mesti sahkan identiti">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Emel Baru (Pilihan)</label>
+                        <input type="email" id="new-email" placeholder="Biarkan kosong jika tiada" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Kata Laluan Baru (Pilihan)</label>
+                        <input type="password" id="new-password" placeholder="Biarkan kosong jika tiada" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 transition-colors">
+                    </div>
+                </div>
+
+                <button type="submit" id="setup-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-all flex justify-center items-center gap-2">
+                    <span id="setup-btn-text">Simpan Perubahan</span>
+                    <i id="setup-btn-spinner" class="fas fa-circle-notch fa-spin hidden"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- ========================================== -->
+    <script>
+        // Google Sheet CSV URL
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgxWeoxfbuJff8E-RfTPaTaWkXbp--fhJhYMpf6PRV1GdBLQTBCdRmesBTfwGE1p_pJ1SItOnjYKsX/pub?output=csv';
+        
+        // URL Web App Google Apps Script (Sila gantikan dengan URL anda setelah deploy)
+        const appScriptUrl = 'https://script.google.com/macros/s/AKfycbxeSUFi-x__svVf2RSW9X5HHXx0AbxCEEMxDeDYQg1Qa9Qd6BFLUqhR26wAxXChBRxNvg/exec';
+        
+        let usersData = [];
+        let isDataLoaded = false;
+        let loggedInUserEmail = ""; // Menyimpan rekod sesi siapa log masuk
+
+        // Fetch and parse CSV data on page load
+        async function fetchUsers() {
+            const statusEl = document.getElementById('data-status');
+            const loginBtn = document.getElementById('login-btn');
+            
+            try {
+                // Disable login button while fetching
+                loginBtn.disabled = true;
+                loginBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+                
+                // Parse CSV (simple split by newline and comma)
+                const rows = csvText.split('\n').map(row => row.trim()).filter(row => row);
+                
+                // Assuming row 0 is headers, loop from row 1
+                for (let i = 1; i < rows.length; i++) {
+                    const columns = rows[i].split(',');
+                    if (columns.length >= 2) {
+                        usersData.push({
+                            email: columns[0].trim().toLowerCase(),
+                            password: columns[1].trim()
+                        });
+                    }
+                }
+                
+                isDataLoaded = true;
+                statusEl.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i> Sistem sedia digunakan';
+                statusEl.classList.replace('text-slate-400', 'text-green-600');
+                
+                // Enable button
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+
+            } catch (error) {
+                console.error("Ralat mengambil data:", error);
+                statusEl.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500 mr-1"></i> Gagal menyambung ke pangkalan data';
+                statusEl.classList.replace('text-slate-400', 'text-red-500');
+            }
+        }
+
+        // Handle Login Submission
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!isDataLoaded) {
+                alert("Sila tunggu sebentar. Sedang memuat turun data...");
+                return;
+            }
+
+            const inputEmail = document.getElementById('email').value.trim().toLowerCase();
+            const inputPassword = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('error-message');
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+
+            // UI Loading state
+            btnText.innerText = "Mengesahkan...";
+            btnSpinner.classList.remove('hidden');
+            errorMsg.classList.add('hidden');
+
+            // Simulate slight network delay for realistic UX
+            setTimeout(() => {
+                // Validate against Google Sheet Data
+                const userExists = usersData.find(user => user.email === inputEmail && user.password === inputPassword);
+
+                if (userExists) {
+                    // Success Login
+                    loggedInUserEmail = userExists.email;
+                    document.getElementById('current-email').value = loggedInUserEmail; // Bekalkan terus ke ruangan Tetapan Akaun
+
+                    document.getElementById('login-form').reset();
+                    showView('dashboard-view');
+                } else {
+                    // Failed Login
+                    errorMsg.classList.remove('hidden');
+                }
+                
+                // Reset Button UI
+                btnText.innerText = "Log Masuk";
+                btnSpinner.classList.add('hidden');
+            }, 800);
+        });
+
+        // View Controller functions
+        function showView(viewId) {
+            // Hide all views safely
+            ['login-view', 'dashboard-view', 'generator-view', 'setup-view'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            
+            // Show targeted view
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+                
+                // Re-trigger animation
+                targetView.classList.remove('fade-in');
+                void targetView.offsetWidth; // trigger reflow
+                targetView.classList.add('fade-in');
+            }
+        }
+
+        function logout() {
+            if(confirm("Adakah anda pasti mahu log keluar?")) {
+                loggedInUserEmail = "";
+                showView('login-view');
+            }
+        }
+
+        // Setup Account Form Submission
+        document.getElementById('setup-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (appScriptUrl === 'SILA_MASUKKAN_URL_WEB_APP_APPSCRIPT_DI_SINI') {
+                alert("Sila letakkan URL Web App AppScript anda dalam fail kod HTML terlebih dahulu!");
+                return;
+            }
+
+            const currentEmail = document.getElementById('current-email').value;
+            const currentPassword = document.getElementById('current-password').value;
+            let newEmail = document.getElementById('new-email').value.trim().toLowerCase();
+            let newPassword = document.getElementById('new-password').value.trim();
+
+            const setupMsg = document.getElementById('setup-message');
+            const btnText = document.getElementById('setup-btn-text');
+            const btnSpinner = document.getElementById('setup-btn-spinner');
+
+            if (!newEmail && !newPassword) {
+                alert("Sila isikan emel baru atau kata laluan baru jika mahu mengemaskini.");
+                return;
+            }
+            if (!newEmail) newEmail = currentEmail;
+            if (!newPassword) newPassword = currentPassword;
+
+            // UI Loading state
+            btnText.innerText = "Menyimpan Data...";
+            btnSpinner.classList.remove('hidden');
+            setupMsg.classList.add('hidden');
+
+            try {
+                const response = await fetch(appScriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        currentEmail: currentEmail,
+                        currentPassword: currentPassword,
+                        newEmail: newEmail,
+                        newPassword: newPassword
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === "Success") {
+                    setupMsg.className = "text-sm p-3 rounded-lg border text-center mb-6 bg-green-50 border-green-200 text-green-700";
+                    setupMsg.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${result.message}`;
+                    setupMsg.classList.remove('hidden');
+                    
+                    // Update cache local elak error CSV lambat sync
+                    let userIndex = usersData.findIndex(u => u.email === currentEmail && u.password === currentPassword);
+                    if (userIndex !== -1) {
+                        usersData[userIndex].email = newEmail;
+                        usersData[userIndex].password = newPassword;
+                    }
+
+                    loggedInUserEmail = newEmail;
+                    document.getElementById('current-email').value = loggedInUserEmail;
+                    document.getElementById('current-password').value = "";
+                    document.getElementById('new-email').value = "";
+                    document.getElementById('new-password').value = "";
+                } else {
+                    setupMsg.className = "text-sm p-3 rounded-lg border text-center mb-6 bg-red-50 border-red-200 text-red-700";
+                    setupMsg.innerHTML = `<i class="fas fa-exclamation-circle mr-1"></i> ${result.message}`;
+                    setupMsg.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error('Ralat sambungan AppScript:', error);
+                setupMsg.className = "text-sm p-3 rounded-lg border text-center mb-6 bg-red-50 border-red-200 text-red-700";
+                setupMsg.innerHTML = '<i class="fas fa-wifi mr-1"></i> Ralat menghantar data. Sila semak URL AppScript.';
+                setupMsg.classList.remove('hidden');
+            } finally {
+                btnText.innerText = "Simpan Perubahan";
+                btnSpinner.classList.add('hidden');
+            }
+        });
+
+        // Initialize script
+        window.onload = () => {
+            fetchUsers();
+        };
+    </script>
+</body>
+</html>
