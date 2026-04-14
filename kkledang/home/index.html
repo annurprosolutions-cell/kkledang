@@ -83,7 +83,7 @@
             </div>
 
             <!-- Card 2: Analisis Dashboard -->
-            <a href="/dashboard" onclick="showToast('Modul Analisis sedang diselenggara.', 'info'); return false;" class="block group cursor-pointer bg-white rounded-2xl p-8 shadow-sm border border-slate-200 hover:border-emerald-500 hover:shadow-lg transition-all relative overflow-hidden flex flex-col items-center text-center">
+            <a href="/dashboard" class="block group cursor-pointer bg-white rounded-2xl p-8 shadow-sm border border-slate-200 hover:border-emerald-500 hover:shadow-lg transition-all relative overflow-hidden flex flex-col items-center text-center">
                 <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
                 <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
                     <i class="fas fa-chart-pie"></i>
@@ -121,7 +121,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             <!-- Sub Card 1 -->
-            <a href="/kertas-kerja" onclick="showToast('Pautan Kertas Kerja diklik.', 'success'); return false;" class="group bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-indigo-500 hover:shadow-md transition-all flex flex-col items-center text-center">
+            <a href="/kertas-kerja" class="group bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-indigo-500 hover:shadow-md transition-all flex flex-col items-center text-center">
                 <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center text-2xl mb-4 group-hover:-translate-y-1 transition-transform">
                     <i class="fas fa-file-alt"></i>
                 </div>
@@ -129,7 +129,7 @@
             </a>
 
             <!-- Sub Card 2 -->
-            <a href="/laporan-kursus" onclick="showToast('Pautan Laporan Kursus diklik.', 'success'); return false;" class="group bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-purple-500 hover:shadow-md transition-all flex flex-col items-center text-center">
+            <a href="/laporan-kursus" class="group bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-purple-500 hover:shadow-md transition-all flex flex-col items-center text-center">
                 <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center text-2xl mb-4 group-hover:-translate-y-1 transition-transform">
                     <i class="fas fa-chalkboard-teacher"></i>
                 </div>
@@ -137,7 +137,7 @@
             </a>
 
             <!-- Sub Card 3 -->
-            <a href="/surat-arahan" onclick="showToast('Pautan Surat Arahan diklik.', 'success'); return false;" class="group bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-amber-500 hover:shadow-md transition-all flex flex-col items-center text-center">
+            <a href="/surat-arahan" class="group bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-amber-500 hover:shadow-md transition-all flex flex-col items-center text-center">
                 <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center text-2xl mb-4 group-hover:-translate-y-1 transition-transform">
                     <i class="fas fa-envelope-open-text"></i>
                 </div>
@@ -165,8 +165,8 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-2">Emel Semasa</label>
-                        <input type="email" id="current-email" value="admin@sistem.com" class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 cursor-not-allowed" readonly>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Emel Semasa (Wajib)</label>
+                        <input type="email" id="current-email" required placeholder="Masukkan emel semasa anda" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none transition-colors">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-2">Kata Laluan Semasa (Wajib)</label>
@@ -255,13 +255,27 @@
         document.addEventListener('DOMContentLoaded', () => {
             const setupForm = document.getElementById('setup-form');
             
+            // WAJIB LETAKKAN URL WEB APP APPS SCRIPT ANDA DI SINI
+            // Cth: https://script.google.com/macros/s/AKfyc.../exec
+            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwL2MuXc8MVxosrMAOCir7d27Bix3tgpBvWR0YiMsxl2jS1S93en6q-m1T3j1cj4YTwEg/exec';
+            
             if(setupForm) {
-                setupForm.addEventListener('submit', (e) => {
+                setupForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     
                     const btnText = document.getElementById('setup-btn-text');
                     const spinner = document.getElementById('setup-btn-spinner');
                     const btn = document.getElementById('setup-btn');
+
+                    const currentEmail = document.getElementById('current-email').value;
+                    const currentPassword = document.getElementById('current-password').value;
+                    const newEmail = document.getElementById('new-email').value;
+                    const newPassword = document.getElementById('new-password').value;
+
+                    if (APPS_SCRIPT_URL === 'LETAK_URL_WEB_APP_DI_SINI') {
+                        showToast("Sila masukkan URL Web App Apps Script pada kod HTML", "error");
+                        return;
+                    }
 
                     // Mula "loading"
                     btnText.textContent = "Menyimpan...";
@@ -269,26 +283,55 @@
                     btn.classList.add('opacity-75', 'cursor-not-allowed');
                     btn.disabled = true;
 
-                    // Simulasi delay pemprosesan (API call)
-                    setTimeout(() => {
+                    try {
+                        // Hantar API Request ke Google Apps Script
+                        const response = await fetch(APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            redirect: "follow",
+                            headers: {
+                                "Content-Type": "text/plain;charset=utf-8",
+                            },
+                            body: JSON.stringify({
+                                currentEmail: currentEmail,
+                                currentPassword: currentPassword,
+                                newEmail: newEmail,
+                                newPassword: newPassword
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.status === 'success') {
+                            showToast(result.message, "success");
+                            
+                            // Kemaskini visual jika emel diubah
+                            if (newEmail && newEmail.trim() !== '') {
+                                document.getElementById('current-email').value = newEmail;
+                            }
+                            
+                            // Kosongkan form input
+                            document.getElementById('current-password').value = '';
+                            document.getElementById('new-email').value = '';
+                            document.getElementById('new-password').value = '';
+                            
+                            // Kembali ke dashboard selepas sedikit masa
+                            setTimeout(() => {
+                                showView('dashboard-view');
+                            }, 1500);
+                        } else {
+                            showToast(result.message, "error");
+                        }
+
+                    } catch (error) {
+                        console.error(error);
+                        showToast("Gagal menyambung ke pangkalan data.", "error");
+                    } finally {
                         // Tamat "loading"
                         btnText.textContent = "Simpan Perubahan";
                         spinner.classList.add('hidden');
                         btn.classList.remove('opacity-75', 'cursor-not-allowed');
                         btn.disabled = false;
-                        
-                        // Kosongkan form password
-                        document.getElementById('current-password').value = '';
-                        document.getElementById('new-password').value = '';
-                        
-                        showToast("Tetapan akaun berjaya dikemaskini!", "success");
-                        
-                        // Kembali ke dashboard selepas sedikit masa
-                        setTimeout(() => {
-                            showView('dashboard-view');
-                        }, 1500);
-
-                    }, 1500);
+                    }
                 });
             }
             
