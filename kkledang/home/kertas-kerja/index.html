@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Penjana Kertas Kerja</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
@@ -54,12 +52,12 @@
             text-align: left;
         }
 
-        /* Input highlight in preview (Red text like the image) */
+        /* Input highlight in preview (Semua teks kini hitam) */
         .input-hl {
-            color: #dc2626; /* text-red-600 */
+            color: #000000;
         }
         .input-hl-bold {
-            color: #dc2626;
+            color: #000000;
             font-weight: bold;
         }
 
@@ -83,10 +81,8 @@
 </head>
 <body class="flex flex-col md:flex-row md:h-screen md:overflow-hidden bg-gray-100 font-sans">
 
-    <!-- LEFT PANEL: FORM INPUT -->
     <div class="w-full md:w-1/2 md:h-full md:overflow-y-auto bg-white border-r border-gray-300 p-5 md:p-8 flex flex-col">
         
-        <!-- Header dengan Butang Back -->
         <div class="flex items-center mb-6 border-b pb-2">
             <a href="/home" class="mr-4 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
@@ -97,7 +93,6 @@
         
         <form id="reportForm" class="space-y-6 flex-grow">
             
-            <!-- Bahagian 1: Maklumat Asas -->
             <div class="border rounded-md p-4 bg-gray-50 space-y-4">
                 <h3 class="font-bold text-gray-700 border-b pb-2">Maklumat Asas</h3>
                 
@@ -111,7 +106,12 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Tajuk Kertas Kerja</label>
-                    <textarea id="in-tajuk" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 input-trigger" placeholder="Contoh: KURSUS PENGHASILAN POSTER DIGITAL..."></textarea>
+                    <textarea id="in-tajuk" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 input-trigger" placeholder="Contoh: PENGHASILAN POSTER..."></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">No. ID Kursus</label>
+                    <input type="text" id="in-no-id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 input-trigger" placeholder="Contoh: J022026ON44050201818801">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -121,12 +121,14 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Disediakan Oleh (Nama)</label>
-                        <input type="text" id="in-disediakan-oleh" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 input-trigger" placeholder="Nama Penyedia">
+                        <select id="in-disediakan-oleh" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 bg-white input-trigger">
+                            <option value="">-- Pilih Nama Penyedia --</option>
+                            <option disabled>Memuat turun data...</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            <!-- Bahagian 2: Kandungan Kertas Kerja -->
             <div class="border rounded-md p-4 bg-gray-50 space-y-4">
                 <h3 class="font-bold text-gray-700 border-b pb-2">1. Pengenalan, 2. Tujuan & 3. Objektif</h3>
                 
@@ -137,7 +139,12 @@
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">2. Tujuan</label>
-                    <textarea id="in-tujuan" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 input-trigger" placeholder="Kertas kerja ini disediakan untuk..."></textarea>
+                    <select id="tujuan-selector" class="mt-1 mb-2 block w-full rounded-md border-gray-300 shadow-sm border p-2 bg-white text-sm">
+                        <option value="">-- Tambah Tujuan dari Pangkalan Data --</option>
+                        <option disabled>Memuat turun data...</option>
+                    </select>
+                    <textarea id="in-tujuan" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 input-trigger" placeholder="Pilih dari senarai di atas atau taip secara manual...
+1. Kertas kerja ini disediakan untuk..."></textarea>
                 </div>
 
                 <div>
@@ -146,11 +153,12 @@
                         <option value="">-- Tambah Objektif dari Pangkalan Data --</option>
                         <option disabled>Memuat turun data...</option>
                     </select>
-                    <textarea id="in-objektif" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 input-trigger" placeholder="Pilih dari senarai di atas atau taip secara manual...&#10;1. Meningkatkan kemahiran...&#10;2. Memahami teknik..."></textarea>
+                    <textarea id="in-objektif" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 input-trigger" placeholder="Pilih dari senarai di atas atau taip secara manual...
+1. Meningkatkan kemahiran...
+2. Memahami teknik..."></textarea>
                 </div>
             </div>
 
-            <!-- Bahagian 3: Pelaksanaan -->
             <div class="border rounded-md p-4 bg-gray-50 space-y-4">
                 <h3 class="font-bold text-gray-700 border-b pb-2">4. Tarikh & Tempat & 5. Sasaran</h3>
                 
@@ -189,7 +197,6 @@
                 </div>
             </div>
 
-            <!-- Bahagian 4: Jawatankuasa (Dinamik) -->
             <div class="border rounded-md p-4 bg-gray-50 space-y-4">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h3 class="font-bold text-gray-700">6. Jawatankuasa</h3>
@@ -197,21 +204,19 @@
                 </div>
                 
                 <div id="jk-container" class="space-y-3">
-                    <!-- Default Rows -->
                     <div class="flex gap-2 items-center jk-row">
                         <input type="text" placeholder="Jawatan (Cth: Penyelaras)" value="Penyelaras" class="w-1/3 text-sm rounded-md border-gray-300 shadow-sm border p-2 jk-jawatan input-trigger">
                         <input type="text" placeholder="Nama" class="w-full text-sm rounded-md border-gray-300 shadow-sm border p-2 jk-nama input-trigger">
-                        <button type="button" onclick="removeRow(this)" class="text-red-500 font-bold px-2">&times;</button>
+                        <button type="button" onclick="removeRow(this)" class="text-red-500 font-bold px-2">×</button>
                     </div>
                     <div class="flex gap-2 items-center jk-row">
                         <input type="text" placeholder="Jawatan" value="Pensyarah Utama" class="w-1/3 text-sm rounded-md border-gray-300 shadow-sm border p-2 jk-jawatan input-trigger">
                         <input type="text" placeholder="Nama" class="w-full text-sm rounded-md border-gray-300 shadow-sm border p-2 jk-nama input-trigger">
-                        <button type="button" onclick="removeRow(this)" class="text-red-500 font-bold px-2">&times;</button>
+                        <button type="button" onclick="removeRow(this)" class="text-red-500 font-bold px-2">×</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Bahagian 5: Kewangan -->
             <div class="border rounded-md p-4 bg-gray-50 space-y-4">
                 <h3 class="font-bold text-gray-700 border-b pb-2">7. Implikasi Kewangan</h3>
                 
@@ -232,16 +237,14 @@
                         <button type="button" onclick="addPerbelanjaan('', '')" class="text-xs bg-blue-100 text-blue-700 font-semibold py-1 px-2 rounded hover:bg-blue-200">+ Tambah Perbelanjaan</button>
                     </div>
                     <div id="perbelanjaan-container" class="space-y-2">
-                        <!-- Generates via JS for cleanliness, mapping to codes -->
-                    </div>
+                        </div>
                     <div class="mt-4 pt-2 border-t font-bold flex justify-between text-lg">
                         <span>JUMLAH BESAR:</span>
-                        <span id="label-jumlah-kewangan" class="text-red-600">RM 0.00</span>
+                        <span id="label-jumlah-kewangan" class="text-gray-900">RM 0.00</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Bahagian 6: Jadual (Dinamik) -->
             <div class="border rounded-md p-4 bg-gray-50 space-y-4">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h3 class="font-bold text-gray-700">8. Jadual Pelaksanaan</h3>
@@ -249,37 +252,32 @@
                 </div>
                 
                 <div id="jadual-container" class="space-y-3">
-                    <!-- Default Rows -->
                     <div class="flex gap-2 items-start jadual-row">
                         <textarea placeholder="Masa (Cth: 08.00 - 09.00 pagi\n1 jam)" rows="2" class="w-1/3 text-sm rounded-md border-gray-300 shadow-sm border p-2 jd-masa input-trigger"></textarea>
                         <textarea placeholder="Perkara (Cth: Pendaftaran & Pengenalan)" rows="2" class="w-full text-sm rounded-md border-gray-300 shadow-sm border p-2 jd-perkara input-trigger"></textarea>
-                        <button type="button" onclick="removeRow(this)" class="text-red-500 font-bold px-2 mt-2">&times;</button>
+                        <button type="button" onclick="removeRow(this)" class="text-red-500 font-bold px-2 mt-2">×</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Bahagian 7: Penutup -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">9. Penutup</label>
                 <textarea id="in-penutup" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 input-trigger" placeholder="Diharapkan kertas kerja ini diluluskan..."></textarea>
             </div>
 
-            <!-- Tandatangan -->
             <div class="border rounded-md p-4 bg-gray-50 mb-10">
                 <label class="block text-sm font-medium text-gray-700 mb-2 border-b pb-2">Tandatangan Pengesah</label>
                 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <!-- Disahkan (Timbalan Pengarah) -->
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">Disahkan Oleh (Timbalan Pengarah)</label>
                         <div class="p-4 border rounded bg-white flex flex-col items-center justify-center h-[150px]">
-                            <img src="https://i.postimg.cc/gkfRWppZ/logomqsa.png" class="h-20 object-contain mb-2 scale-110">
+                            <img src="https://lh3.googleusercontent.com/d/1lG40IKxN6gR7RK0YvwamEfWQftDTd71d" class="h-20 object-contain mb-2 scale-110">
                             <span class="text-xs font-bold text-gray-800">PUAN ZULITA BINTI ZAINUDDIN</span>
                             <span class="text-[10px] text-gray-500">Timbalan Pengarah</span>
                         </div>
                     </div>
                     
-                    <!-- Disahkan (Pengarah) -->
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">Disahkan Oleh (Pengarah)</label>
                         <div class="relative">
@@ -296,7 +294,6 @@
                 </div>
             </div>
             
-            <!-- Bahagian Butang Tindakan -->
             <div class="sticky bottom-0 bg-white pt-4 pb-4 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3 z-20 mt-6 shadow-[0_-10px_15px_-3px_rgba(255,255,255,1)]">
                 <button type="button" onclick="simpanKeGoogleSheet()" id="btn-simpan-db" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 sm:py-2 px-6 rounded shadow transition duration-200 flex items-center justify-center gap-2">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
@@ -311,20 +308,16 @@
         </form>
     </div>
 
-    <!-- RIGHT PANEL: PREVIEW & EXPORT -->
     <div class="w-full md:w-1/2 md:h-full bg-gray-200 overflow-auto relative py-6 md:py-8">
         
         <div class="sticky top-4 z-10 w-[90%] sm:w-full max-w-3xl mx-auto flex justify-center items-center bg-white p-3 sm:p-4 rounded-md shadow-md mb-6 border border-gray-200">
             <span class="font-bold text-gray-700 text-base sm:text-lg text-center">Pratonton Kertas Kerja</span>
         </div>
 
-        <!-- PDF CONTAINER (What gets exported) -->
         <div id="pdf-container" class="w-max mx-auto flex flex-col text-[14px]">
             
-            <!-- ================= MUKA SURAT 1: COVER ================= -->
             <div class="a4-page flex flex-col items-center justify-center text-center">
                 
-                <!-- Logo -->
                 <img src="https://i.postimg.cc/Z5h6h8dy/image.png" alt="Logo Institusi" class="mx-auto h-32 object-contain mb-8" crossorigin="anonymous">
 
                 <p class="text-sm uppercase mb-16">KOLEJ KOMUNITI LEDANG</p>
@@ -336,15 +329,13 @@
                 </h2>
 
                 <div class="absolute bottom-[10mm] left-0 w-full text-center text-xs text-gray-500">
-                    &copy; 2026 Kolej Komuniti Ledang
+                    © 2026 Kolej Komuniti Ledang
                 </div>
             </div>
 
-            <!-- ================= MUKA SURAT 2: KANDUNGAN ================= -->
             <div class="pdf-page-break"></div>
             <div class="a4-page">
                 
-                <!-- Header -->
                 <div class="w-full flex justify-between items-center border-b border-gray-400 pb-2 mb-6 shrink-0">
                     <div class="flex items-center gap-4">
                         <img src="https://i.postimg.cc/qMvh8p3k/image.png" crossorigin="anonymous" class="h-10 object-contain">
@@ -353,7 +344,6 @@
                     <span class="text-sm text-gray-600 font-semibold header-tarikh" id="out-header-tarikh-2">-</span>
                 </div>
 
-                <!-- Header Kandungan -->
                 <div class="text-center font-bold mb-8">
                     <h2 id="out-kategori" class="text-xl input-hl uppercase mb-6">KURSUS PENDEK</h2>
                     
@@ -361,32 +351,27 @@
                     
                     <p class="mb-10">DISEDIAKAN OLEH:<br><span id="out-disediakan-oleh" class="input-hl uppercase">NAMA PENYEDIA</span></p>
                     
-                    <p class="uppercase">KERTAS KERJA <span id="out-tajuk-content" class="input-hl">[ TAJUK KERTAS KERJA ]</span></p>
+                    <p class="uppercase text-center">KERTAS KERJA <span id="out-tajuk-content" class="input-hl">[ TAJUK KERTAS KERJA ]</span><br><span id="out-no-id-content" class="input-hl font-bold">([ NO ID KURSUS ])</span></p>
                 </div>
 
-                <!-- Isi Kandungan -->
                 <div class="space-y-6 text-justify">
                     
-                    <!-- 1. Pengenalan -->
                     <div>
                         <p class="font-bold mb-2">1. PENGENALAN</p>
                         <p><span id="out-tajuk-pengenalan" class="input-hl-bold uppercase">[ TAJUK KERTAS KERJA ]</span> <span id="out-pengenalan">merupakan bidang yang terkandung dalam Pembelajaran Sepanjang Hayat...</span></p>
                     </div>
 
-                    <!-- 2. Tujuan -->
                     <div>
                         <p class="font-bold mb-2">2. TUJUAN</p>
-                        <p id="out-tujuan">Kertas kerja ini disediakan untuk mendapatkan kelulusan daripada Pengarah.</p>
+                        <div id="out-tujuan" class="pl-8 whitespace-pre-wrap">Kertas kerja ini disediakan untuk mendapatkan kelulusan daripada Pengarah.</div>
                     </div>
 
-                    <!-- 3. Objektif -->
                     <div>
                         <p class="font-bold mb-2">3. OBJEKTIF</p>
                         <p class="mb-1">Di akhir kursus ini, diharapkan peserta akan:</p>
                         <div id="out-objektif" class="pl-8 whitespace-pre-wrap">1. Meningkatkan kemahiran...</div>
                     </div>
 
-                    <!-- 4. Tarikh & Masa/Tempat -->
                     <div>
                         <p class="font-bold mb-2">4. TARIKH & MASA/TEMPAT</p>
                         <table class="w-full border-none">
@@ -396,33 +381,27 @@
                         </table>
                     </div>
 
-                    <!-- 5. Sasaran Peserta -->
                     <div>
                         <p class="font-bold mb-2">5. SASARAN PESERTA</p>
                         <p>Peserta adalah terdiri daripada <span id="out-sasaran-siapa" class="uppercase">KOMUNITI SETEMPAT</span>.</p>
                         <p>Dianggarkan seramai <span id="out-sasaran-bil" class="input-hl-bold">0</span> orang peserta akan menghadiri KURSUS ini.</p>
                     </div>
 
-                    <!-- 6. Jawatankuasa -->
                     <div>
                         <p class="font-bold mb-2">6. JAWATANKUASA</p>
                         <table class="w-full border-none" id="out-jk-table">
-                            <!-- Populated by JS -->
-                        </table>
+                            </table>
                     </div>
                 </div>
                 
-                <!-- Footer Muka Surat 2 -->
                 <div class="absolute bottom-[10mm] left-0 w-full text-center text-xs text-gray-500">
-                    &copy; 2026 Kolej Komuniti Ledang
+                    © 2026 Kolej Komuniti Ledang
                 </div>
             </div>
 
-            <!-- ================= MUKA SURAT 3: KEWANGAN ================= -->
             <div class="pdf-page-break"></div>
             <div class="a4-page">
                 
-                <!-- Header -->
                 <div class="w-full flex justify-between items-center border-b border-gray-400 pb-2 mb-6 shrink-0">
                     <div class="flex items-center gap-4">
                         <img src="https://i.postimg.cc/qMvh8p3k/image.png" crossorigin="anonymous" class="h-10 object-contain">
@@ -433,7 +412,6 @@
 
                 <p class="font-bold mb-6">7. IMPLIKASI KEWANGAN</p>
                 
-                <!-- Jadual Yuran (Ikut Gambar) -->
                 <div class="w-1/2 mb-6 border border-black">
                     <div class="border-b border-black p-2 font-bold uppercase text-xs bg-gray-50" id="out-kew-header">KURSUS PENDEK</div>
                     <div class="flex border-b border-black">
@@ -446,30 +424,25 @@
                     </div>
                 </div>
 
-                <!-- Jadual Perbelanjaan -->
                 <table class="report-table text-xs">
                     <tbody id="out-perbelanjaan-table">
-                        <!-- Populated by JS -->
-                    </tbody>
+                        </tbody>
                     <tfoot>
                         <tr>
                             <td colspan="2" class="text-right font-bold py-3">JUMLAH KESELURUHAN</td>
-                            <td class="font-bold text-red-600 py-3 w-1/4">RM <span id="out-jumlah-keseluruhan">0.00</span></td>
+                            <td class="font-bold text-black py-3 w-1/4">RM <span id="out-jumlah-keseluruhan">0.00</span></td>
                         </tr>
                     </tfoot>
                 </table>
                 
-                <!-- Footer Muka Surat 3 -->
                 <div class="absolute bottom-[10mm] left-0 w-full text-center text-xs text-gray-500">
-                    &copy; 2026 Kolej Komuniti Ledang
+                    © 2026 Kolej Komuniti Ledang
                 </div>
             </div>
 
-            <!-- ================= MUKA SURAT 4: JADUAL & PENUTUP ================= -->
             <div class="pdf-page-break"></div>
             <div class="a4-page flex flex-col">
                 
-                <!-- Header -->
                 <div class="w-full flex justify-between items-center border-b border-gray-400 pb-2 mb-6 shrink-0">
                     <div class="flex items-center gap-4">
                         <img src="https://i.postimg.cc/qMvh8p3k/image.png" crossorigin="anonymous" class="h-10 object-contain">
@@ -478,7 +451,6 @@
                     <span class="text-sm text-gray-600 font-semibold header-tarikh" id="out-header-tarikh-4">-</span>
                 </div>
 
-                <!-- 8. Jadual -->
                 <div class="mb-10">
                     <p class="font-bold mb-4">8. JADUAL</p>
                     <table class="report-table text-sm text-center">
@@ -489,25 +461,21 @@
                             </tr>
                         </thead>
                         <tbody id="out-jadual-table">
-                            <!-- Populated by JS -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
 
-                <!-- 9. Penutup -->
                 <div class="mb-12">
                     <p class="font-bold mb-2">9. PENUTUP</p>
                     <p id="out-penutup" class="text-justify">Diharapkan kertas kerja ini diluluskan dan perancangan kursus mampu berjalan dengan lancar.</p>
                 </div>
 
-                <!-- Tandatangan -->
                 <div class="mt-auto mb-10">
                     <div class="flex justify-between w-full mt-10 px-4 text-sm">
-                        <!-- Disahkan (Timbalan Pengarah) -->
                         <div class="w-[45%] flex flex-col items-center text-center">
                             <span class="font-bold mb-2 block w-full text-left">Disahkan Oleh:</span>
                             <div class="h-32 w-full border-b border-gray-400 flex items-end justify-center pb-2 relative">
-                                <img src="https://i.postimg.cc/gkfRWppZ/logomqsa.png" alt="Tandatangan Timbalan Pengarah" class="max-h-full max-w-full scale-125 origin-bottom" crossorigin="anonymous">
+                                <img src="https://lh3.googleusercontent.com/d/1lG40IKxN6gR7RK0YvwamEfWQftDTd71d" alt="Tandatangan Timbalan Pengarah" class="max-h-full max-w-full scale-125 origin-bottom" crossorigin="anonymous">
                             </div>
                             <div class="w-full text-left mt-2">
                                 <p class="font-bold uppercase">PUAN ZULITA BINTI ZAINUDDIN</p>
@@ -515,7 +483,6 @@
                             </div>
                         </div>
 
-                        <!-- Disahkan (Pengarah) -->
                         <div class="w-[45%] flex flex-col items-center text-center">
                             <span class="font-bold mb-2 block w-full text-left">Disahkan Oleh:</span>
                             <div class="h-32 w-full border-b border-gray-400 flex items-end justify-center pb-2 relative">
@@ -529,16 +496,14 @@
                     </div>
                 </div>
                 
-                <!-- Footer Muka Surat 4 -->
                 <div class="absolute bottom-[10mm] left-0 w-full text-center text-xs text-gray-500">
-                    &copy; 2026 Kolej Komuniti Ledang
+                    © 2026 Kolej Komuniti Ledang
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- MAIN LOGIC -->
     <script>
         // Data Struktur Implikasi Kewangan (Boleh diubah oleh pengguna)
         const kewanganItems = [
@@ -574,7 +539,7 @@
                         <span class="text-xs text-gray-500 mr-2">RM</span>
                         <input type="number" class="kew-input w-full text-xs p-1 border rounded input-trigger" value="${val}" placeholder="0.00">
                     </div>
-                    <button type="button" onclick="removePerbelanjaan(this)" class="text-red-500 font-bold px-2">&times;</button>
+                    <button type="button" onclick="removePerbelanjaan(this)" class="text-red-500 font-bold px-2">×</button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', html);
@@ -604,10 +569,10 @@
         const simpleBindings = [
             { in: 'in-kategori', out: ['out-kategori', 'out-kew-header'] },
             { in: 'in-tajuk', out: ['out-tajuk-cover', 'out-tajuk-content', 'out-tajuk-pengenalan', 'out-header-tajuk-2', 'out-header-tajuk-3', 'out-header-tajuk-4'] },
+            { in: 'in-no-id', out: ['out-no-id-content'] }, // Removed 'out-no-id-cover' from here
             { in: 'in-anjuran', out: ['out-anjuran'] },
             { in: 'in-disediakan-oleh', out: ['out-disediakan-oleh'] },
             { in: 'in-pengenalan', out: ['out-pengenalan'] },
-            { in: 'in-tujuan', out: ['out-tujuan'] },
             { in: 'in-tempat', out: ['out-tempat'] },
             { in: 'in-sasaran-siapa', out: ['out-sasaran-siapa'] },
             { in: 'in-sasaran-bil', out: ['out-sasaran-bil'] },
@@ -629,6 +594,7 @@
                     // Fallbacks
                     if (!val) {
                         if(b.in === 'in-tajuk') val = '[ TAJUK KERTAS KERJA ]';
+                        else if(b.in === 'in-no-id') val = '[ NO ID KURSUS ]';
                         else if(b.in === 'in-disediakan-oleh') val = 'NAMA PENYEDIA';
                         else if(b.in === 'in-sasaran-siapa') val = 'KOMUNITI SETEMPAT';
                         else if(b.in === 'in-sasaran-bil') val = '0';
@@ -640,7 +606,10 @@
                     b.out.forEach(outId => {
                         const outEl = document.getElementById(outId);
                         if(outEl) {
-                            if(outId === 'out-disediakan-oleh' || outId === 'out-nama-disahkan-sign') {
+                            if(b.in === 'in-no-id') {
+                                outEl.textContent = val !== '[ NO ID KURSUS ]' ? `(${val})` : '([ NO ID KURSUS ])';
+                            }
+                            else if(outId === 'out-disediakan-oleh' || outId === 'out-nama-disahkan-sign') {
                                 outEl.textContent = val !== '-' ? val.toUpperCase() : '( SILA ISI NAMA )';
                             } else {
                                 outEl.textContent = val;
@@ -705,7 +674,15 @@
             });
             updateDateTime();
 
-            // Bind Objektif (Needs specific formatting with new lines)
+            // Bind Tujuan (Format multi-line)
+            const tjInput = document.getElementById('in-tujuan');
+            tjInput.addEventListener('input', () => {
+                const val = tjInput.value.trim();
+                const outEl = document.getElementById('out-tujuan');
+                outEl.innerHTML = val ? val.replace(/\n/g, '<br>') : '-';
+            });
+
+            // Bind Objektif (Format multi-line)
             const objInput = document.getElementById('in-objektif');
             objInput.addEventListener('input', () => {
                 const val = objInput.value.trim();
@@ -739,7 +716,7 @@
                 <div class="flex gap-2 items-center jk-row">
                     <input type="text" placeholder="Jawatan" class="w-1/3 text-sm rounded-md border-gray-300 shadow-sm border p-2 jk-jawatan input-trigger">
                     <input type="text" placeholder="Nama" class="w-full text-sm rounded-md border-gray-300 shadow-sm border p-2 jk-nama input-trigger">
-                    <button type="button" onclick="removeRow(this); renderJawatankuasa();" class="text-red-500 font-bold px-2">&times;</button>
+                    <button type="button" onclick="removeRow(this); renderJawatankuasa();" class="text-red-500 font-bold px-2">×</button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', html);
@@ -772,7 +749,7 @@
                 <div class="flex gap-2 items-start jadual-row">
                     <textarea placeholder="Masa" rows="2" class="w-1/3 text-sm rounded-md border-gray-300 shadow-sm border p-2 jd-masa input-trigger"></textarea>
                     <textarea placeholder="Perkara" rows="2" class="w-full text-sm rounded-md border-gray-300 shadow-sm border p-2 jd-perkara input-trigger"></textarea>
-                    <button type="button" onclick="removeRow(this); renderJadual();" class="text-red-500 font-bold px-2 mt-2">&times;</button>
+                    <button type="button" onclick="removeRow(this); renderJadual();" class="text-red-500 font-bold px-2 mt-2">×</button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', html);
@@ -902,33 +879,63 @@
             img.classList.add('hidden');
         }
 
-        // Fungsi memuat turun data Objektif dari CSV
-        async function loadObjektifData() {
+        // Fungsi memuat turun data dari CSV (Objektif, Nama, & Tujuan)
+        async function loadSheetData() {
             const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQxJIvbNCiV9MIK631LC-u8fYdBNv6ykGEihf69nPWREztWIACz77mJE7BcpBpLZ0K3bONm54aov2gp/pub?gid=292940197&single=true&output=csv";
-            const selector = document.getElementById('objektif-selector');
+            const objSelector = document.getElementById('objektif-selector');
+            const namaSelector = document.getElementById('in-disediakan-oleh');
+            const tujuanSelector = document.getElementById('tujuan-selector');
+            
             try {
                 const response = await fetch(csvUrl);
                 const text = await response.text();
                 const rows = parseCSV(text);
                 
-                selector.innerHTML = '<option value="">-- Tambah Objektif dari Pangkalan Data --</option>';
+                objSelector.innerHTML = '<option value="">-- Tambah Objektif dari Pangkalan Data --</option>';
+                namaSelector.innerHTML = '<option value="">-- Pilih Nama Penyedia --</option>';
+                tujuanSelector.innerHTML = '<option value="">-- Tambah Tujuan dari Pangkalan Data --</option>';
                 
-                // Mula dari baris 1 (Abaikan baris tajuk 'Objektif')
+                const addedNames = new Set();
+                
+                // Mula dari baris 1 (Abaikan baris tajuk)
                 for (let i = 1; i < rows.length; i++) {
                     const cols = rows[i];
                     if (!cols || cols.length === 0) continue;
+                    
+                    // Lajur A: Objektif
                     const objektif = cols[0] ? cols[0].trim() : '';
                     if (objektif) {
                         const opt = document.createElement('option');
                         opt.value = objektif;
                         // Papar had 80 aksara di dropdown jika terlalu panjang supaya paparan kemas
                         opt.textContent = objektif.length > 80 ? objektif.substring(0, 80) + '...' : objektif;
-                        selector.appendChild(opt);
+                        objSelector.appendChild(opt);
+                    }
+                    
+                    // Lajur B: Nama
+                    const nama = cols[1] ? cols[1].trim() : '';
+                    if (nama && !addedNames.has(nama)) {
+                        addedNames.add(nama);
+                        const optName = document.createElement('option');
+                        optName.value = nama;
+                        optName.textContent = nama;
+                        namaSelector.appendChild(optName);
+                    }
+
+                    // Lajur C: Tujuan
+                    const tujuan = cols[2] ? cols[2].trim() : '';
+                    if (tujuan) {
+                        const optTujuan = document.createElement('option');
+                        optTujuan.value = tujuan;
+                        optTujuan.textContent = tujuan.length > 80 ? tujuan.substring(0, 80) + '...' : tujuan;
+                        tujuanSelector.appendChild(optTujuan);
                     }
                 }
             } catch (error) {
-                console.error("Ralat memuat turun objektif:", error);
-                selector.innerHTML = '<option value="">-- Ralat memuat turun data --</option>';
+                console.error("Ralat memuat turun data:", error);
+                objSelector.innerHTML = '<option value="">-- Ralat memuat turun data --</option>';
+                namaSelector.innerHTML = '<option value="">-- Ralat memuat turun data --</option>';
+                tujuanSelector.innerHTML = '<option value="">-- Ralat memuat turun data --</option>';
             }
         }
 
@@ -980,11 +987,38 @@
             textarea.dispatchEvent(new Event('input'));
         });
 
+        // Logik Tambah Tujuan ke Textarea apabila ia dipilih dari Dropdown
+        document.getElementById('tujuan-selector').addEventListener('change', function() {
+            const selectedVal = this.value;
+            if (!selectedVal) return;
+            
+            const textarea = document.getElementById('in-tujuan');
+            let currentText = textarea.value.trim();
+            
+            // Kira baris untuk letak nombor turutan seterusnya secara automatik
+            let lines = currentText.split('\n').filter(line => line.trim() !== '');
+            let nextNum = lines.length + 1;
+            
+            let newEntry = `${nextNum}. ${selectedVal}`;
+            
+            if (currentText === '') {
+                textarea.value = newEntry;
+            } else {
+                textarea.value = currentText + '\n' + newEntry;
+            }
+            
+            // Reset dropdown
+            this.value = '';
+            
+            // Cetuskan event 'input' supaya ia terus terpapar di panel Pratonton (Live Preview)
+            textarea.dispatchEvent(new Event('input'));
+        });
+
         // 7. Initialization
         window.addEventListener('load', () => {
             initBindings();
             setupSignatureCanvas('canvas-disahkan', 'out-sign-disahkan');
-            loadObjektifData(); // Muat turun data CSV untuk dropdown Objektif
+            loadSheetData(); // Muat turun data CSV untuk dropdown Objektif, Nama & Tujuan
         });
 
         // 8. PDF Export
@@ -1023,7 +1057,7 @@
         // 9. Simpan ke DB (Retained Logic)
         window.simpanKeGoogleSheet = async function() {
             // Gunakan URL Apps Script sedia ada anda di sini jika perlu
-            const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRli7BfrYz4QSHWg88p5DjshpBX56JgG3mGZJHy2eYLgwsxBHRfg3gJejglr2Tn7SXGg/exec";
+            const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUgqmiTnLtsvzJwxX2Jquj88qDHWuiei7qgfhmyuaHoD0elnwZhVWlaukxSt5gdwga7A/exec";
             
             const btn = document.getElementById('btn-simpan-db');
             const originalText = btn.innerHTML;
@@ -1059,6 +1093,7 @@
                     jenis_dokumen: "KERTAS KERJA",
                     kategori: document.getElementById('in-kategori').value,
                     tajuk: document.getElementById('in-tajuk').value || '-',
+                    no_id: document.getElementById('in-no-id').value || '-',
                     anjuran: document.getElementById('in-anjuran').value || '-',
                     disediakan_oleh: document.getElementById('in-disediakan-oleh').value || '-',
                     tarikh: document.getElementById('out-tarikh').textContent || '-',
