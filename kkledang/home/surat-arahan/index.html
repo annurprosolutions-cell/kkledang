@@ -103,8 +103,10 @@
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 1 (Utama)</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
-                        <input type="text" id="in-nama-1" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
-                        <input type="text" id="in-ic-1" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                        <select id="in-nama-1" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase bg-white">
+                            <option value="">-- PILIH NAMA --</option>
+                        </select>
+                        <input type="text" id="in-ic-1" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm bg-gray-100" placeholder="No Kad Pengenalan" readonly>
                     </div>
                 </div>
 
@@ -112,8 +114,10 @@
                     <button type="button" onclick="buangPenerima(2)" class="absolute top-2 right-0 text-xs text-red-600 hover:underline font-semibold">Buang</button>
                     <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 2</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
-                        <input type="text" id="in-nama-2" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
-                        <input type="text" id="in-ic-2" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                        <select id="in-nama-2" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase bg-white">
+                            <option value="">-- PILIH NAMA --</option>
+                        </select>
+                        <input type="text" id="in-ic-2" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm bg-gray-100" placeholder="No Kad Pengenalan" readonly>
                     </div>
                 </div>
 
@@ -121,8 +125,10 @@
                     <button type="button" onclick="buangPenerima(3)" class="absolute top-2 right-0 text-xs text-red-600 hover:underline font-semibold">Buang</button>
                     <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 3</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
-                        <input type="text" id="in-nama-3" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
-                        <input type="text" id="in-ic-3" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                        <select id="in-nama-3" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase bg-white">
+                            <option value="">-- PILIH NAMA --</option>
+                        </select>
+                        <input type="text" id="in-ic-3" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm bg-gray-100" placeholder="No Kad Pengenalan" readonly>
                     </div>
                 </div>
 
@@ -130,8 +136,10 @@
                     <button type="button" onclick="buangPenerima(4)" class="absolute top-2 right-0 text-xs text-red-600 hover:underline font-semibold">Buang</button>
                     <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 4</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
-                        <input type="text" id="in-nama-4" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
-                        <input type="text" id="in-ic-4" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                        <select id="in-nama-4" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase bg-white">
+                            <option value="">-- PILIH NAMA --</option>
+                        </select>
+                        <input type="text" id="in-ic-4" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm bg-gray-100" placeholder="No Kad Pengenalan" readonly>
                     </div>
                 </div>
 
@@ -139,8 +147,10 @@
                     <button type="button" onclick="buangPenerima(5)" class="absolute top-2 right-0 text-xs text-red-600 hover:underline font-semibold">Buang</button>
                     <label class="block text-xs font-semibold text-gray-600 uppercase">Penerima 5</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
-                        <input type="text" id="in-nama-5" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase" placeholder="Nama Penuh">
-                        <input type="text" id="in-ic-5" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm" placeholder="No Kad Pengenalan">
+                        <select id="in-nama-5" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm uppercase bg-white">
+                            <option value="">-- PILIH NAMA --</option>
+                        </select>
+                        <input type="text" id="in-ic-5" class="block w-full rounded-md border-gray-300 shadow-sm border p-2 text-sm bg-gray-100" placeholder="No Kad Pengenalan" readonly>
                     </div>
                 </div>
             </div>
@@ -218,8 +228,8 @@
                 
                 <!-- HEADER LETTERHEAD -->
                 <div class="flex items-center border-b-[1.5px] border-black pb-2 mb-4">
-                    <div class="w-24 shrink-0 flex items-center justify-center mr-4">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/400px-Coat_of_arms_of_Malaysia.svg.png" alt="Jata" class="h-16 object-contain">
+                    <div class="w-32 shrink-0 flex items-center justify-center mr-4">
+                        <img src="https://lh3.googleusercontent.com/d/1ejfke3Ssg0F1SObikIWcmbQ12cpQELtY" alt="Jata" class="h-28 object-contain">
                     </div>
                     <div class="flex-grow flex flex-col justify-center">
                         <h1 class="font-bold text-[12pt] leading-tight">KOLEJ KOMUNITI LEDANG</h1>
@@ -405,16 +415,64 @@
             document.getElementById('out-tarikh-surat').textContent = formatted || '-- KOSONG --';
         });
 
-        document.getElementById('in-nama-1').addEventListener('input', function() {
-            document.getElementById('out-nama-1').textContent = this.value || 'NAMA PENERIMA 1';
-        });
-        document.getElementById('in-ic-1').addEventListener('input', function() {
-            document.getElementById('out-ic-1').textContent = this.value || 'NO IC PENERIMA 1';
-        });
-
-        const btnTambahPenerima = document.getElementById('btn-tambah-penerima');
         const maxPenerima = 5;
+        const btnTambahPenerima = document.getElementById('btn-tambah-penerima');
+
+        // Tarik data daripada Google Sheets (Tab References)
+        const csvSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQWDmOJEGbBgrh7K7LMdM1JaEJsYYgeA41UOdX0uVk9kB0JG8UHGKjwmijBxCceFOfuN9W9di5v_ox_/pub?gid=704351486&single=true&output=csv';
         
+        async function muatDataGoogleSheet() {
+            try {
+                const response = await fetch(csvSheetUrl);
+                const dataText = await response.text();
+                
+                const lines = dataText.split('\n');
+                let rekodData = [];
+                
+                for (let i = 1; i < lines.length; i++) { // Abaikan header baris 1
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    let inQuotes = false;
+                    let value = '';
+                    let row = [];
+                    for (let j = 0; j < line.length; j++) {
+                        const char = line[j];
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            row.push(value);
+                            value = '';
+                        } else {
+                            value += char;
+                        }
+                    }
+                    row.push(value);
+
+                    if (row.length >= 2) {
+                        rekodData.push({ nama: row[0].trim(), ic: row[1].trim() });
+                    }
+                }
+
+                // Masukkan senarai ke dalam semua dropdown
+                for (let i = 1; i <= maxPenerima; i++) {
+                    const selectEl = document.getElementById(`in-nama-${i}`);
+                    if(selectEl) {
+                        rekodData.forEach(item => {
+                            const opt = document.createElement('option');
+                            opt.value = item.nama;
+                            opt.textContent = item.nama;
+                            opt.dataset.ic = item.ic;
+                            selectEl.appendChild(opt);
+                        });
+                    }
+                }
+            } catch(e) {
+                console.error("Ralat ambil data CSV", e);
+            }
+        }
+        muatDataGoogleSheet();
+
         btnTambahPenerima.addEventListener('click', function() {
             for (let i = 2; i <= maxPenerima; i++) {
                 const container = document.getElementById(`penerima-${i}-input-container`);
@@ -439,20 +497,31 @@
         function updatePenerima(index) {
             const nama = document.getElementById(`in-nama-${index}`).value.trim();
             const ic = document.getElementById(`in-ic-${index}`).value.trim();
-            const container = document.getElementById(`out-penerima-${index}-container`);
             
-            if (nama || ic) {
-                container.classList.remove('hidden');
-                document.getElementById(`out-nama-${index}`).textContent = nama || `NAMA PENERIMA ${index}`;
-                document.getElementById(`out-ic-${index}`).textContent = ic || `NO IC PENERIMA ${index}`;
+            if (index === 1) {
+                document.getElementById('out-nama-1').textContent = nama || 'NAMA PENERIMA 1';
+                document.getElementById('out-ic-1').textContent = ic || 'NO IC PENERIMA 1';
             } else {
-                container.classList.add('hidden');
+                const container = document.getElementById(`out-penerima-${index}-container`);
+                if (nama || ic) {
+                    container.classList.remove('hidden');
+                    document.getElementById(`out-nama-${index}`).textContent = nama || `NAMA PENERIMA ${index}`;
+                    document.getElementById(`out-ic-${index}`).textContent = ic || `NO IC PENERIMA ${index}`;
+                } else {
+                    container.classList.add('hidden');
+                }
             }
         }
         
-        for (let i = 2; i <= maxPenerima; i++) {
-            document.getElementById(`in-nama-${i}`).addEventListener('input', () => updatePenerima(i));
-            document.getElementById(`in-ic-${i}`).addEventListener('input', () => updatePenerima(i));
+        for (let i = 1; i <= maxPenerima; i++) {
+            const selectNama = document.getElementById(`in-nama-${i}`);
+            const inputIc = document.getElementById(`in-ic-${i}`);
+            
+            selectNama.addEventListener('change', function() {
+                const selectedOpt = this.options[this.selectedIndex];
+                inputIc.value = selectedOpt.dataset.ic || '';
+                updatePenerima(i);
+            });
         }
 
         document.getElementById('in-tajuk-program').addEventListener('input', function() {
@@ -529,7 +598,7 @@
         }
 
         async function simpanKeGoogleSheet() {
-            const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFvHI4LLnXY3Ts33edOYgyS9QN7TO_PYoRpxd3GCD_rX7Kt85a7ybuovRK6H2s3xapzg/exec";
+            const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr6CgXwniad1O5u4OnXIXOpG9aeb-58bAeqfAaV7ZM-MvOAZRW0K5fjRzA2k4xLpIE3A/exec";
             
             if (!APPSCRIPT_URL || APPSCRIPT_URL === "MASUKKAN_WEB_APP_URL_ANDA_DI_SINI") {
                 showMessage("Sila masukkan Web App URL Google Apps Script ke dalam kod sumber terlebih dahulu.", 'Peringatan');
